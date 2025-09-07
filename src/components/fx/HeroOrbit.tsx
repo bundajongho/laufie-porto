@@ -24,11 +24,17 @@ function Twinkle({ size = 6, duration = 1.8, delay = 0, className = '' }: Twinkl
 
 export default function HeroOrbit() {
   return (
-    // Perbesar area orbit (avatar tetap), agar ada ruang di kanan
-    <div className="relative mx-auto grid h-[420px] w-[420px] place-items-center md:h-[560px] md:w-[560px]">
+    // Pakai aspect-square agar selalu lingkaran (width === height) di semua ukuran, termasuk tablet
+    <div className="relative mx-auto grid aspect-square w-[420px] place-items-center md:w-[560px]">
       {/* Orbit rings */}
-      <div className="absolute inset-0 orbit-ring opacity-30" style={{ borderWidth: 2 }} />
-      <div className="absolute inset-[24px] md:inset-[33px] rounded-full border-dashed border-white/35 opacity-20" style={{ borderWidth: 2 }} />
+      <div
+        className="absolute inset-0 rounded-full border border-white/25 opacity-30 orbit-ring"
+        style={{ borderWidth: 2 }}
+      />
+      <div
+        className="absolute inset-[24px] md:inset-[33px] rounded-full border-dashed border-white/35 opacity-20"
+        style={{ borderWidth: 2 }}
+      />
       <m.div
         className="absolute inset-[48px] md:inset-[66px] rounded-full border-dashed border-white/40"
         style={{ borderWidth: 2 }}
@@ -65,17 +71,25 @@ export default function HeroOrbit() {
         <span className="absolute -top-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary-200 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
       </m.div>
 
-      {/* Avatar + satu efek kilau yang menyapu (dipercepat) */}
+      {/* Avatar + glare sweep — kecilkan khusus di lgx (>=1200 & <1280) */}
       <div className="group relative z-10 overflow-hidden rounded-full border border-white/10 shadow-[0_0_26px_rgba(0,0,0,0.3)]">
         <div className="relative">
           <ImageWithFallback
             src={avatarUrl}
             alt="Avatar"
             fallback="/favicon.svg"
-            className="h-[280px] w-[280px] md:h-[360px] md:w-[360px] transform transition-transform duration-700 ease-out will-change-transform group-hover:scale-110"
+            className="
+              h-[270px] w-[270px]
+              sm:h-[270px] sm:w-[270px]
+              md:h-[350px] md:w-[350px]
+              lg:h-[300px] lg:w-[300px]
+              lgx:h-[340px] lgx:w-[340px]
+              xl:h-[340px] xl:w-[340px]
+              transform transition-transform duration-700 ease-out will-change-transform group-hover:scale-110
+            "
           />
 
-          {/* Kilau (glare sweep) lebih cepat, berulang */}
+          {/* Kilau (glare sweep) */}
           <m.div
             className="pointer-events-none absolute inset-0 z-[2] rounded-full mix-blend-screen"
             style={{
@@ -119,7 +133,7 @@ export default function HeroOrbit() {
         <Star size={16} />
       </m.div>
 
-      {/* Elongated bullet near orbit (bigger) */}
+      {/* Elongated bullet near orbit */}
       <m.span
         className="absolute -left-10 top-6 h-4 w-10 rounded-full bg-primary-400/70"
         animate={{ x: [0, 8, 0], rotate: [0, 6, 0] }}

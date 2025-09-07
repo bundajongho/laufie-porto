@@ -17,7 +17,7 @@ type CTAButtonProps = {
   downloadName?: string
 }
 
-// CTA dengan fill-wipe: solid c3 <-> outline saat hover
+// CTA responsive: lebih kecil di mobile
 function CTAButton({ href, label, icon, variant, onClick, downloadName }: CTAButtonProps) {
   const [hovered, setHovered] = useState(false)
   const isSolid = variant === 'primary' ? !hovered : hovered
@@ -29,14 +29,15 @@ function CTAButton({ href, label, icon, variant, onClick, downloadName }: CTABut
       download={downloadName ? downloadName : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`relative inline-flex items-center gap-2 rounded-xl px-5 py-3 font-medium overflow-hidden transition-all duration-200 ${
-        isSolid ? 'text-white' : 'border border-white/15 bg-white/5 text-white'
-      }`}
+      className={`relative inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium
+                  overflow-hidden transition-all duration-200
+                  md:rounded-xl md:px-5 md:py-3 md:text-base
+                  ${isSolid ? 'text-white' : 'border border-white/15 bg-white/5 text-white'}`}
       style={isSolid ? { background: 'transparent' } : undefined}
     >
       <m.span
         aria-hidden
-        className="absolute inset-y-0 left-0 rounded-xl"
+        className="absolute inset-y-0 left-0 rounded-lg md:rounded-xl"
         style={{ background: 'var(--c3)' }}
         animate={{ width: isSolid ? '100%' : '0%' }}
         transition={{ duration: 0.28, ease: 'easeInOut' }}
@@ -59,25 +60,21 @@ export default function HomeSection() {
 
   const handleDownloadCV = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
-
     try {
       const resp = await fetch(cvUrl, { method: 'GET', cache: 'no-store' })
       if (!resp.ok) {
         toast('File not available.', { variant: 'error' })
         return
       }
-
       const ct = (resp.headers.get('content-type') || '').toLowerCase()
       const buf = await resp.arrayBuffer()
       const sig = new Uint8Array(buf.slice(0, 4))
       const isPDFSig = sig[0] === 0x25 && sig[1] === 0x50 && sig[2] === 0x44 && sig[3] === 0x46
       const isPDFType = ct.includes('pdf')
-
       if (!isPDFSig && !isPDFType) {
         toast('File not available.', { variant: 'error' })
         return
       }
-
       const blob = new Blob([buf], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -93,26 +90,27 @@ export default function HomeSection() {
   }
 
   return (
-    <Section id="home" className="pt-36 relative">
+    <Section id="home" className="relative pt-28 sm:pt-32 lg:pt-36">
       {/* Mobile/Tablet: 1 kolom; Desktop (lg+): 2 kolom */}
-      <div className="grid items-center gap-10 lg:grid-cols-2">
-        {/* Left column (konten) — urutan kedua di mobile/tablet; center di mobile/tablet */}
+      <div className="grid items-center justify-items-center gap-6 sm:gap-8 lg:gap-10 lg:grid-cols-2 lg:justify-items-stretch">
+        {/* Left column (konten) — center & lebih ramping di mobile */}
         <m.div
           variants={staggerContainer()}
           initial="initial"
           whileInView="animate"
           viewport={{ once: true }}
           className="
-            relative transform-gpu
+            relative order-2 transform-gpu text-center
+            w-full max-w-[320px] px-4 sm:max-w-[420px] sm:px-0 md:max-w-[560px]
+            mx-auto
+            lg:order-1 lg:max-w-none lg:text-left
             lg:-translate-y-6 xl:-translate-y-8
-            order-2 lg:order-1
-            text-center lg:text-left
           "
         >
           <m.h1
             variants={fadeInUp}
             className="font-bold"
-            style={{ fontSize: 'clamp(36px, 6.5vw, 74px)', lineHeight: 1.04 }}
+            style={{ fontSize: 'clamp(28px, 7vw, 74px)', lineHeight: 1.06 }}
           >
             <span className="title-gradient inline-block">Laufie</span>
             <br />
@@ -122,37 +120,42 @@ export default function HomeSection() {
           {/* Title */}
           <m.p
             variants={fadeInUp}
-            className="mt-6 font-mono"
-            style={{ fontSize: 'clamp(20px, 4.5vw, 32px)' }}
+            className="mt-4 font-mono sm:mt-6"
+            style={{ fontSize: 'clamp(16px, 5.2vw, 32px)' }}
           >
             <TypewriterTitle />
           </m.p>
 
           {/* Deskripsi */}
-          <m.p variants={fadeInUp} className="mt-6 text-white/70">
+          <m.p
+            variants={fadeInUp}
+            className="mx-auto mt-4 max-w-[58ch] text-pretty text-white/70 sm:mt-6 lg:mx-0"
+          >
             I blend logic and creativity to craft smart, data-driven, and user-friendly solutions—whether
             through clean code, insightful analysis, or intuitive design.
           </m.p>
 
-          {/* CTA — center di mobile/tablet, left di desktop */}
+          {/* CTA — lebih kecil di mobile */}
           <m.div
             variants={fadeInUp}
-            className="mt-8 flex flex-wrap items-center gap-3 justify-center lg:justify-start"
+            className="mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 lg:justify-start"
           >
-            <CTAButton href="#about" label="View More" variant="primary" icon={<ArrowRight size={18} />} />
+            <CTAButton href="#about" label="View More" variant="primary" icon={<ArrowRight size={16} />} />
             <CTAButton
               href={cvUrl}
               label="Download CV"
               variant="outline"
-              icon={<Download size={18} />}
+              icon={<Download size={16} />}
               downloadName="Laufie-Alexandria-CV.pdf"
               onClick={handleDownloadCV}
             />
           </m.div>
 
-          {/* Socials — center di mobile/tablet */}
-          <m.div variants={fadeInUp} className="mt-6 flex justify-center lg:block">
-            <SocialButtons />
+          {/* Socials — diperkecil di mobile dengan scale */}
+          <m.div variants={fadeInUp} className="mt-5 flex justify-center lg:block">
+            <div className="origin-top scale-90 sm:scale-100">
+              <SocialButtons />
+            </div>
           </m.div>
 
           {/* Decorative floaters (desktop only) */}
@@ -163,7 +166,7 @@ export default function HomeSection() {
               transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
             />
             <m.span
-              className="absolute right-[-22px] top-[8%] h-6 w-6 rounded-lg bg-primary-500/20 border border-white/10 backdrop-blur-[2px]"
+              className="absolute right-[-22px] top-[8%] h-6 w-6 rounded-lg border border-white/10 bg-primary-500/20 backdrop-blur-[2px]"
               animate={{ rotate: [0, 25, 0, -25, 0], y: [0, -8, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             />
@@ -203,22 +206,23 @@ export default function HomeSection() {
           </div>
         </m.div>
 
-        {/* Right column (avatar + orbit) — mobile/tablet: muncul dulu, dinaikkan; desktop: rata kanan */}
+        {/* Right column (avatar + orbit) — diperbesar di mobile & tablet */}
         <div
           className="
-            order-1 lg:order-2
-            self-center lg:justify-self-end
-            transform-gpu
+            order-1 transform-gpu
+            w-full max-w-[420px] sm:max-w-[520px] md:max-w-[620px]
+            justify-self-center
+            -mt-4 sm:-mt-6 md:-mt-8 lg:mt-0
+            lg:order-2 lg:justify-self-end
             lg:-translate-y-6 xl:-translate-y-12 lg:translate-x-6 xl:translate-x-12 2xl:translate-x-16
-            -mt-6 sm:-mt-10 md:-mt-12 lg:mt-0
-            scale-[0.86] sm:scale-[0.9] md:scale-[0.86] lg:scale-100
           "
         >
           <m.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.92 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            className="mx-auto flex items-center justify-center"
           >
             <HeroOrbit />
           </m.div>
@@ -226,7 +230,7 @@ export default function HomeSection() {
       </div>
 
       {/* Scroll to explore — hanya desktop (lg+) */}
-      <div className="hidden lg:flex absolute inset-x-0 bottom-20 md:bottom-24 flex-col items-center justify-center">
+      <div className="absolute inset-x-0 bottom-20 hidden flex-col items-center justify-center md:bottom-24 lg:flex">
         <m.a
           href="#about"
           initial={{ opacity: 0, y: 6 }}

@@ -4,6 +4,10 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      // Tambahkan breakpoint di atas lg tapi di bawah xl
+      screens: {
+        lgx: '1200px',
+      },
       colors: {
         bg: { DEFAULT: 'hsl(220 15% 7%)', soft: 'hsl(220 15% 9%)', raised: 'hsl(220 14% 12%)' },
         card: { DEFAULT: 'hsl(220 14% 12%)' },
