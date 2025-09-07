@@ -1,18 +1,18 @@
 import Section from '@/components/common/Section'
 import SectionHeading from '@/components/common/SectionHeading'
-import { Mail, Phone, MapPin, Send, Zap } from 'lucide-react'
+import { Mail, Phone, MapPin, Send, Zap, Loader2 } from 'lucide-react'
 import { FooterContent } from './FooterSection'
 import { m } from 'framer-motion'
-import React from 'react'
+import React, { useState } from 'react'
 import { contact } from '@/data/socials'
 import { useToast } from '@/providers/ToastProvider'
 
 export default function ContactSection() {
   const { toast } = useToast()
+  const [loading, setLoading] = useState(false)
 
   return (
     <Section id="contact">
-      {/* Scoped helpers */}
       <style>{`
         input.form-field:-webkit-autofill,
         textarea.form-field:-webkit-autofill {
@@ -89,16 +89,22 @@ export default function ContactSection() {
         {/* Right: Form */}
         <form
           className="glass relative rounded-2xl p-6 md:p-7"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault()
+            if (loading) return
+
             const form = e.currentTarget as HTMLFormElement
             const nameEl = form.querySelector<HTMLInputElement>('input[name="name"]')
             const emailEl = form.querySelector<HTMLInputElement>('input[name="email"]')
+            const subjectEl = form.querySelector<HTMLInputElement>('input[name="subject"]')
             const messageEl = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
+            const hpEl = form.querySelector<HTMLInputElement>('input[name="hp"]')
 
             const name = nameEl?.value.trim() || ''
             const email = emailEl?.value.trim() || ''
+            const subject = subjectEl?.value.trim() || 'New message from portfolio'
             const message = messageEl?.value.trim() || ''
+            const hp = hpEl?.value || ''
 
             if (!email || !isEmailValid(email)) {
               toast('Please enter a valid email address.', { variant: 'error' })
@@ -115,7 +121,38 @@ export default function ContactSection() {
               return
             }
 
-            toast('Message sent successfully!', { variant: 'success' })
+            try {
+              setLoading(true)
+
+              const resp = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, subject, message, hp }),
+              })
+
+              let json: any = {}
+              try {
+                json = await resp.json()
+              } catch {
+                json = {}
+              }
+
+              if (!resp.ok || !json?.ok) {
+                if (!navigator.onLine) throw new Error('No internet connection.')
+                if (resp.status >= 500) throw new Error('Server error. Please try again later.')
+                if (resp.status === 400) throw new Error('Invalid form data.')
+                if (resp.status === 405) throw new Error('Method not allowed.')
+                throw new Error(json?.error || 'Failed to send message. Please try again later.')
+              }
+
+              toast('Message sent successfully!', { variant: 'success' })
+              form.reset()
+            } catch (err: any) {
+              console.error('[contact] send failed:', err)
+              toast(err?.message || 'Failed to send message. Please try again later.', { variant: 'error' })
+            } finally {
+              setLoading(false)
+            }
           }}
           noValidate
         >
@@ -139,26 +176,47 @@ export default function ContactSection() {
             />
           </div>
 
+          {/* Honeypot (anti-bot) */}
+          <input
+            type="text"
+            name="hp"
+            autoComplete="off"
+            tabIndex={-1}
+            className="hidden"
+            aria-hidden="true"
+          />
+
           <button
             className="
               group mt-6 w-full rounded-xl px-4 py-3 font-medium
               text-white shadow-[0_10px_30px_rgba(0,0,0,0.35)]
               transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]
+              disabled:cursor-not-allowed disabled:opacity-60
             "
             style={{ background: 'linear-gradient(90deg, var(--c3), var(--c2))' }}
             type="submit"
+            disabled={loading}
           >
             <span className="inline-flex items-center justify-center gap-2">
-              <span
-                className="
-                  inline-grid place-items-center transform-gpu
-                  transition-transform duration-700
-                  group-hover:rotate-[360deg]
-                "
-              >
-                <Send size={18} />
-              </span>
-              Send Message
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <span
+                    className="
+                      inline-grid place-items-center transform-gpu
+                      transition-transform duration-700
+                      group-hover:rotate-[360deg]
+                    "
+                  >
+                    <Send size={18} />
+                  </span>
+                  Send Message
+                </>
+              )}
             </span>
           </button>
         </form>
