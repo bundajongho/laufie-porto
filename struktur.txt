@@ -1,0 +1,106 @@
+laufie-portfo/
+├─ .editorconfig
+├─ .eslint.config.js
+├─ .prettierrc
+├─ components.json                # config shadcn/ui
+├─ index.html                     # Vite entry (jika pakai Vite)
+├─ package.json
+├─ postcss.config.js
+├─ tailwind.config.ts
+├─ tsconfig.json
+├─ vite.config.ts
+├─ public/
+│  ├─ favicon.svg
+│  ├─ laufie-cv.pdf
+│  └─ robots.txt
+└─ src/
+   ├─ main.tsx                    # entry React
+   ├─ App.tsx                     # single-page scaffolding + section order
+   ├─ app.css                     # import @tailwind & global reset (v4)
+   │
+   ├─ styles/                     # styling global & util
+   │  ├─ globals.css              # base, tokens, prefer-reduced-motion, theming
+   │  └─ scrollbar.css            # custom scrollbar
+   │
+   ├─ assets/
+   │  └─ images/
+   │     ├─ avatar.jpeg
+   │     ├─ logos/                # biarkan ini kosong dulu
+   │     └─ projects/             # thumbnail project
+   |        ├─ project-1.png
+   |        ├─ project-2.png
+   |        ├─ project-3.png
+   |        └─ project-hero.png
+   │
+   ├─ components/
+   │  ├─ ui/                      
+   │  │  └─ ...                   # masih kosong, belum tau ini buat apa
+   |  |
+   │  ├─ common/                  # building blocks reusable
+   │  │  ├─ Section.tsx           # wrapper: <section id=...> + padding + container
+   │  │  ├─ SectionHeading.tsx    # judul section konsisten
+   │  │  ├─ Container.tsx         # max-w, gutter
+   │  │  ├─ ThemeToggle.tsx
+   |  |  ├─ TyperwriterTitle.tsx
+   |  |  ├─ SocialButtons.tsx
+   │  │  ├─ ExternalLink.tsx
+   │  │  └─ Badge.tsx
+   |  |
+   │  ├─ fx/              
+   │  │  ├─ CursorFollower.tsx  
+   │  │  ├─ AmbientBackground.tsx     
+   │  │  ├─ HeroOrbit.tsx   
+   │  │  └─ ParticleField.tsx
+   |  |
+   │  ├─ nav/
+   │  │  ├─ DockNav.tsx
+   │  │  ├─ MobileNav.tsx            # nav mobile
+   │  │  ├─ NavItem.tsx
+   │  │  └─ ScrollTopButton.tsx   # tombol back-to-top
+   |  |
+   │  ├─ progress/
+   │  │  ├─ TopProgressBar.tsx    # progress bar tipis di atas layar (on scroll)
+   │  │  └─ CircleProgress.tsx    # indikator lingkaran + % di pojok kanan bawah
+   |  |
+   │  └─ cards/
+   │     ├─ ProjectCard.tsx
+   │     └─ AchievementCard.tsx
+   │
+   ├─ sections/                   # tiap bagian 1 file agar jelas
+   │  ├─ HomeSection.tsx
+   │  ├─ AboutSection.tsx
+   │  ├─ SkillsSection.tsx
+   │  ├─ ProjectsSection.tsx
+   │  ├─ AchievementsSection.tsx
+   │  ├─ ContactSection.tsx
+   │  └─ FooterSection.tsx
+   │
+   ├─ data/                       # konten dipisah dari tampilan
+   │  ├─ nav.ts                   # daftar links ke section (id, label, icon)
+   │  ├─ skills.ts                # list skill + level/icon
+   │  ├─ projects.ts              # list project (title, techs, links, images)
+   │  ├─ achievements.ts          # list penghargaan/cert
+   │  └─ socials.ts               # sosmed & contact
+   │
+   ├─ hooks/                      # custom hooks terisolasi
+   │  ├─ useScrollProgress.ts     # hitung progress [0..1], throttle/raf
+   │  ├─ useSectionObserver.ts    # active section via IntersectionObserver
+   │  ├─ useHashSync.ts           # sync hash URL dengan section aktif
+   │  └─ useIsMounted.ts
+   │
+   ├─ lib/
+   │  ├─ motion/                  # framer-motion variants & helpers
+   │  │  ├─ variants.ts           # fadeIn, slideUp, stagger, etc.
+   │  │  └─ transitions.ts        # easing, durations konsisten
+   │  ├─ utils.ts                 # cn(), clamp(), formatters
+   │  ├─ analytics.ts             # (opsional) tracking
+   │  └─ constants.ts             # SECTION_IDS, BREAKPOINTS, dll
+   │
+   ├─ providers/
+   │  ├─ ThemeProvider.tsx        # shadcn theme + Tailwind
+   │  └─ MotionProvider.tsx       # <LazyMotion/> / reduced motion handling
+   │
+   └─ types/
+      ├─ project.ts
+      ├─ section.ts
+      └─ index.d.ts

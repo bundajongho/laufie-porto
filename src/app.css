@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ring: 0 0% 98%;
+}
+
+* { outline-color: theme('colors.primary.400'); }
+html, body, #root {
+  min-height: 100%;
+  height: auto;
+}
